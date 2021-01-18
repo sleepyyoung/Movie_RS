@@ -1,0 +1,247 @@
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    {#    <link rel="icon" href="../../favicon.ico">#}
+    <title>注册</title>
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href={% static "/css/signin.css" %} rel="stylesheet">
+    <script src={% static '/js/myjs.js' %}></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
+    <script type="text/javascript">
+        //验证码动态刷新实现
+        $('.captcha').click(function () {
+            $.getJSON("/captcha/refresh/", function (result) {
+                $('.captcha').attr('src', result['image_url']);
+                $('#id_captcha_0').val(result['key'])
+            });
+        });
+    </script>
+</head>
+<body style="padding-top: 20px;">
+<div class="alert alert-danger alert-dismissible" role="alert" id="register_error"
+     style="margin-left: auto;margin-right: auto;text-align: center;
+             {% if not register_error %}display: none;{% else %}{% endif %}">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+            onclick="javascript:document.getElementById('register_error').style.display = 'none'">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <strong>{{ register_error }}</strong>
+</div>
+
+
+<div class="container1" style="width: 45%;margin-left: 30%;">
+    <form id="id_form" class="form-horizontal" method="post">{% csrf_token %}
+        <h2 class="form-signin-heading" align="center">注册</h2>
+        <div class="form-group">
+            <label for="{{ register_form.nickname.id_for_label }}"
+                   class="col-md-2 control-label"
+                   style="text-align: right;width: 170px;">{{ register_form.nickname.label }}</label>
+            <div class="col-sm-9  " style="width: 350px;display: inline-block;">
+                {{ register_form.nickname }}
+            </div>
+            <span style="color: red">{{ register_form.nickname.errors.0 }}</span>
+        </div>
+        <div class="form-group">
+            <label for="{{ register_form.username.id_for_label }}"
+                   class="col-sm-2 control-label font-position-right"
+                   style="text-align: right;width: 170px;display: inline-block;">{{ register_form.username.label }}</label>
+            <div class="col-sm-9  " style="width: 350px;display: inline-block;">
+                {{ register_form.username }}
+            </div>
+            <span style="color: red;">{{ register_form.username.errors.0 }}</span>
+        </div>
+        <div class="form-group">
+            <label for="{{ register_form.first_password.id_for_label }}"
+                   class="col-sm-2 control-label font-position-right"
+                   style="text-align: right;width: 170px;display: inline-block;">{{ register_form.first_password.label }}</label>
+            <div class="col-sm-9  " style="width: 350px;display: inline-block;">
+                {{ register_form.first_password }}
+            </div>
+            <span style="color: red">{{ register_form.first_password.errors.0 }}</span>
+        </div>
+        <div class="form-group">
+            <label for="{{ register_form.second_password.id_for_label }}"
+                   class="col-sm-2 control-label font-position-right"
+                   style="text-align: right;width: 170px;display: inline-block;">{{ register_form.second_password.label }}</label>
+            <div class="col-sm-9  " style="width: 350px;display: inline-block;">
+                {{ register_form.second_password }}
+            </div>
+            <span style="color: red">{{ register_form.second_password.errors.0 }}</span>
+        </div>
+        <div class="form-group" align="center">
+            <input id="send_email" class="btn  btn-primary btn-block " type="button" value="点击向邮箱发送验证码"
+                   style="width: 300px;">
+        </div>
+        <script>
+            $("#send_email").click(function () {
+                var receiver = document.getElementById("id_username").value
+                if (receiver.trim() === "") {
+                    alert("请输入邮箱(用户名)");
+                    return;
+                }
+                $.ajax({
+                    url: "{% url 'enter:send_email' %}",
+                    type: "POST",
+                    catch: true,
+                    data: {
+                        "receiver": receiver,
+                        "method": "register",
+                    },
+                    success: function (data) {
+                        var status = data["error"];
+                        if (status === 0) {
+                            send_email_captcha(document.getElementById("send_email"), 300000);
+                        } else if (status === 1) {
+                            alert("验证码发送出错，请稍后再试")
+                        }
+                    }
+                })
+            })
+        </script>
+        <div class="form-group">
+            <label for="{{ register_form.captcha_email.id_for_label }}"
+                   class="col-sm-2 control-label  font-position-right"
+                   style="text-align: right;width: 170px;display: inline-block;">{{ register_form.captcha_email.label }}</label>
+            <div class="col-sm-9  " style="width: 350px;display: inline-block;">
+                {{ register_form.captcha_email }}
+            </div>
+            <span style="color: red">{{ register_form.captcha_email.errors.0 }}</span>
+        </div>
+        <div class="form-group">
+            <label for="{{ register_form.captcha.id_for_label }}"
+                   class="col-sm-2 control-label  font-position-right"
+                   style="text-align: right;width: 170px;display: inline-block;">{{ register_form.captcha.label }}</label>
+            <div class="col-sm-9  " style="width: 350px;display: inline-block;">
+                {{ register_form.captcha }}
+            </div>
+            <span style="color: red">{{ register_form.captcha.errors.0 }}</span>
+        </div>
+        <script>
+            $('.captcha').click(function () {
+                $.getJSON("/captcha/refresh/", function (result) {
+                    $('.captcha').attr('src', result['image_url']);
+                    $('#id_captcha_0').val(result['key'])
+                });
+            });
+        </script>
+        <div class="form-group" align="center">
+            <label class="col-sm-2 control-label  font-position-right"
+                   style="text-align: right;width: 170px;display: inline-block;">请选择感兴趣的标签:
+            </label>
+            {#            <label class="col-sm-2 control-label  font-position-left"#}
+            {#                   style="text-align: left;width: 170px;display: inline-block;">（最多选择7个）#}
+            {#            </label>#}
+        </div>
+        <script>
+            function set_active(obj) {
+                var classname = obj.className;
+                if (classname.search("active") === -1) {
+                    obj.classList.add('active');
+                    obj.getElementsByTagName("input")[0].setAttribute("value", "1");
+                } else {
+                    obj.classList.remove('active');
+                    obj.getElementsByTagName("input")[0].setAttribute("value", "0");
+                }
+            }
+        </script>
+
+        <ul id="ul_select" class="nav nav-pills">
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.Adventure.label }}</a>
+                {{ register_form.Adventure }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Animation.label }}</a>
+                {{ register_form.Animation }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.Children.label }}</a>
+                {{ register_form.Children }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Comedy.label }}</a>
+                {{ register_form.Comedy }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.Fantasy.label }}</a>
+                {{ register_form.Fantasy }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Romance.label }}</a>
+                {{ register_form.Romance }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.Action.label }}</a>
+                {{ register_form.Action }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Crime.label }}</a>
+                {{ register_form.Crime }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.Thriller.label }}</a>
+                {{ register_form.Thriller }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Horror.label }}</a>
+                {{ register_form.Horror }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.FilmNoir.label }}</a>
+                {{ register_form.FilmNoir }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.Drama.label }}</a>
+                {{ register_form.Drama }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Mystery.label }}</a>
+                {{ register_form.Mystery }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.SciFi.label }}</a>
+                {{ register_form.SciFi }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.War.label }}</a>
+                {{ register_form.War }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Western.label }}</a>
+                {{ register_form.Western }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation"><a
+                    href="javascript:(0)">{{ register_form.Musical.label }}</a>
+                {{ register_form.Musical }}</li>
+            <li class="li_select" onclick="set_active(this);" role="presentation">
+                <a href="javascript:(0)">{{ register_form.IMAX.label }}</a>
+                {{ register_form.IMAX }}</li>
+{#            <li class="li_select" onclick="set_active(this);" role="presentation"><a#}
+{#                    href="javascript:(0)">{{ register_form.Others.label }}</a>#}
+{#                {{ register_form.Others }}</li>#}
+        </ul>
+
+        <div class="form-group" align="center">
+            <button id="register" class="btn  btn-primary btn-block " type="submit" style="width: 300px;">注册</button>
+        </div>
+
+        <script>
+            $("#register").click(function () {
+                var first_password = $("#id_first_password").val()
+                var second_password = $("#id_second_password").val()
+                if (first_password !== second_password) {
+                    alert("两次密码不一致，请重新输入");
+                    return false;
+                }
+            });
+        </script>
+
+    </form>
+</div>
+
+
+</body>
+
+
+</html>
+
+

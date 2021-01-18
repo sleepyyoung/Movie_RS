@@ -1,0 +1,115 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block dropdowm %}
+    <button class="dropbtn">{% if is_login == "true" %}{{ nickname }}{% else %}未登录{% endif %}</button>
+
+    <div class="dropdown-content">
+        {% if is_login == "true" %}
+            <a href="/modify/nickname/{{ username }}/">修改昵称</a>
+            <a href="/modify/password/{{ username }}/">修改密码</a>
+            <a href="{% url 'enter:logout' %}">退出</a>
+            <a href="{% url 'enter:login' %}">切换账号</a>
+        {% else %}
+            <a href="{% url 'enter:login' %}">登录</a>
+            <a href="{% url 'enter:register' %}">注册</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block menu-item %}
+    <li class="menu-item"><a href="{% url 'home:select' %}">首页</a></li>
+    <li class="menu-item"><a href="{% url 'home:douban_250' %}">榜单</a></li>
+    <li class="menu-item"><a href="{% url 'home:recommend' %}">为你推荐</a></li>
+    <li class="menu-item"><a href="{% url 'home:browse_records' %}">足迹</a></li>
+{% endblock %}
+{% block container %}
+    <div class="page">
+        <div class="content">
+            <div class="row" style="margin-bottom: 3px;">
+                <div style="display: inline;margin-left: 20px;margin-right: 20px;float:left;width:273px;height:402px;
+                        background-size: 100% auto;background-repeat: no-repeat;
+                        background-image: url({% static 'IMDb_imgs/' %}{{ all.imdbid }}.jpg)">
+                </div>
+                <div style="float: left;width: 60%;">
+
+                    <h1 style="font-weight: 1000;font-size: 3.5em;" class="movie-title">{{ all.title }}</h1>
+
+                    <div class="movie-summary">
+                        <p>{{ all.summary }} </p>
+                    </div>
+                    <ul class="movie-meta">
+                        <li><strong>Rating: </strong>
+                            <div class="star-rating"><span style="width:{% widthratio all.score 1 10 %}%"
+                                                           id="orange_star"></span></div>
+                            {{ all.score }} / 10
+                        </li>
+                        <li><strong>RatingCount: </strong> {{ all.rating_count }}</li>
+                        <li><strong>Length: </strong> {{ all.length }}</li>
+                        <li><strong>Premiere: </strong> {{ all.premiere }}</li>
+                        <li><strong>Category: </strong> {{ all.the_type }}</li>
+                    </ul>
+                    <ul class="starring">
+                        {% if  all.director %}
+                            <li><strong>Directors:</strong> {{ all.director }}</li>
+                        {% endif %}
+                        {% if  all.writers %}
+                            <li><strong>Writers:</strong> {{ all.writers }}</li>
+                        {% endif %}
+                        {% if  all.stars %}
+                            <li><strong>Stars:</strong> {{ all.stars }}</li>
+                        {% endif %}
+                    </ul>
+                    <ul class="starring">
+                        <li><strong>More Detail: </strong> <a href="{{ all.imdb_link }}" target="_blank">PLEASE CLICK
+                            HERE</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if all.stroy_line %}
+                <h1>Storyline</h1>
+                <div class="entry-content">
+                    <p>{{ all.story_line }}</p>
+                </div>
+            {% endif %}
+            {% if all.did_you_know %}
+                <h1>Did you know?</h1>
+                <div class="entry-content">
+                    <p>{{ all.did_you_know }}</p>
+                </div>
+            {% endif %}
+            {% if is_login == "true" %}
+                <h1>我{% if score != "" %}的{% else %}来{% endif %}评分：</h1>
+                <form method="post" class="search-form" style="margin-bottom: 1%">{% csrf_token %}
+                    <label for="go_score">
+                        <input id="go_score" class="active" name="score" type="text"
+                               {% if score != "" %}value="{{ score }}{% endif %}"
+                               placeholder="请输入你的评分：">
+                    </label>
+                    <button id="score_commit" class="active">
+                        {% if score != "" %}重新{% endif %}评分
+                    </button>
+                </form>
+                <script>
+                    var score_commit_btn = document.getElementById("score_commit")
+                    score_commit_btn.onclick = function () {
+                        var score = parseFloat(document.getElementById("go_score").value);
+                        if (isNaN(score)) {
+                            alert("评分时请输入数字！");
+                            return false;
+                        } else {
+                            if ((score >= 0) && (score <= 5)) {
+                            } else {
+                                alert("请输入 0~5 之间的数字！");
+                                return false;
+                            }
+                        }
+                    }
+                </script>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+

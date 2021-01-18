@@ -1,0 +1,96 @@
+{% extends "master.html" %}
+{% load static %}
+{% block dropdowm %}
+    <button class="dropbtn">{% if is_login == "true" %}{{ nickname }}{% else %}未登录{% endif %}</button>
+
+    <div class="dropdown-content">
+        {% if is_login == "true" %}
+            <a href="/modify/nickname/{{ username }}/">修改昵称</a>
+            <a href="/modify/password/{{ username }}/">修改密码</a>
+            <a href="{% url 'enter:logout' %}">退出</a>
+            <a href="{% url 'enter:login' %}">切换账号</a>
+        {% else %}
+            <a href="{% url 'enter:login' %}">登录</a>
+            <a href="{% url 'enter:register' %}">注册</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block container %}
+    <script>
+        $(document).ready(function () {
+            $("#search_movie").attr("value", "{{ kw }}")
+        })
+
+        function errorImg(img) {
+            img.src = "{% static 'images/img_error.jpg' %}";
+            img.onerror = null;
+        }
+    </script>
+
+    <div class="movie-list">
+        {% for item in all %}
+            <div style="margin-bottom: 1px;" class="movie">
+                <figure class="movie-poster">
+                    <a href="/detail/{{ item.imdbid }}">
+                        <img src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg" alt="{{ item.title }}"
+                             onerror="errorImg(this)">
+                    </a>
+                </figure>
+                <div style="float:left;display:inline;width: 50%;font-family: fantasy;text-shadow: 0 0 1px black;font-size: 15px;color: #131a20">
+                    <p><i>{{ item.year }}</i></p>
+                </div>
+                <div class="star-rating" style="float:right;display:inline;">
+                    <span style="width:{% widthratio item.score 1 10 %}%"></span>
+                </div>
+                <div style="margin-bottom: 1px;float:left;display:inline;width: 80%" class="movie-title"><a
+                        href="/detail/{{ item.imdbid }}">{{ item.title }} </a></div>
+                <div style="float:left;display:inline;width: 20%;height: 20%">
+                    <p style="margin-right:25%;font-family: fantasy;text-shadow: 0 0 2px black;font-size: 25px;color: aqua">
+                        <i>{{ item.score }}</i></p>
+                </div>
+
+            </div>
+        {% endfor %}
+
+
+    </div>
+
+
+
+
+
+
+    <div class="pagination">
+        {% if all.has_previous %}
+            <a class="page-number" href="?kw={{ kw }}&page={{ all.previous_page_number }}">
+                <span class="page-number fa fa-angle-left"></span>
+            </a>
+        {% endif %}
+        <a class="page-number" href="?kw={{ kw }}&page=1" aria-label="Previous"><span aria-hidden="true">首页</span>
+        </a>
+        {% if current_num > 6 %}
+            <span class="page-number" aria-hidden="true">...</span>
+        {% endif %}
+        {% for i in page_range %}
+            {% if current_num == i %}
+                <a class="page-number current" href="?kw={{ kw }}&page={{ i }}">{{ i }}</a>
+            {% else %}
+                <a class="page-number" href="?kw={{ kw }}&page={{ i }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if current_num < tail_page_ellipsis %}
+            <span class="page-number" aria-hidden="true">...</span>
+        {% endif %}
+        <a class="page-number" href="?kw={{ kw }}&page={{ tail_page }}" aria-label="Previous">
+            <span aria-hidden="true">末页</span>
+        </a>
+
+        {% if all.has_next %}
+            <a class="page-number" href="?kw={{ kw }}&page={{ all.next_page_number }}" aria-label="Next">
+                <span class="fa fa-angle-right page-number"></span>
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}

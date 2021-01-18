@@ -1,0 +1,198 @@
+{% extends "master.html" %}
+{% load static %}
+{% block dropdowm %}
+    <button class="dropbtn">{% if is_login == "true" %}{{ nickname }}{% else %}未登录{% endif %}</button>
+
+    <div class="dropdown-content">
+        {% if is_login == "true" %}
+            <a href="/modify/nickname/{{ username }}/">修改昵称</a>
+            <a href="/modify/password/{{ username }}/">修改密码</a>
+            <a href="{% url 'enter:logout' %}">退出</a>
+            <a href="{% url 'enter:login' %}">切换账号</a>
+        {% else %}
+            <a href="{% url 'enter:login' %}">登录</a>
+            <a href="{% url 'enter:register' %}">注册</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block menu-item %}
+    <li class="menu-item"><a href="{% url 'home:select' %}">首页</a></li>
+    <li class="menu-item"><a href="{% url 'home:douban_250' %}">榜单</a></li>
+    <li class="menu-item current-menu-item"><a href="{% url 'home:recommend' %}">为你推荐</a></li>
+    <li class="menu-item"><a href="{% url 'home:browse_records' %}">足迹</a></li>
+{% endblock %}
+{% block container %}
+    <div class="page">
+    <div class="row">
+        <div class="col-md-6">
+            <div style="margin-bottom: 30px;margin-top: 30px;font-size: 40px;">
+                <h1>Recommend For U</h1>
+            </div>
+            <div class="slider">
+                <ul class="slides" style="margin-top: 11%">
+                    {% for item in all3 %}
+                        <li>
+                            <a href="/detail/{{ item.imdbid }}">
+                                <img title="{{ item.title }}"
+                                     src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg"
+                                     alt="{{ item.title }}" class="tooltip"
+                                     onmouseover="tooltip.pop(this, '<h3>{{ item.title }}</h3>{{ item.summary }} ')">
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                {% for item in all2 %}
+                    <div class="col-sm-6 col-md-12">
+                        <div class="latest-movie tooltip"
+                             onmouseover="tooltip.pop(this, '<h3>{{ item.title }}</h3>{{ item.summary }}')">
+                            <a href="/detail/{{ item.imdbid }}">
+                                <img title="{{ item.title }}"
+                                     src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg"
+                                     alt="{{ item.title }}" class="tooltip">
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="row">
+                {% for item in all_small4 %}
+                    <div class="col-sm-6 col-md-12">
+                        <div class="latest-movie tooltip"
+                             onmouseover="tooltip.pop(this, '<h3>{{ item.title }}</h3>{{ item.summary }}')">
+                            <a href="/detail/{{ item.imdbid }}">
+                                <img title="{{ item.title }}"
+                                     src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg"
+                                     alt="{{ item.title }}" class="tooltip">
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            {% for item in all_big4 %}
+                <div class="col-sm-6 col-md-3">
+                    <div class="latest-movie tooltip"
+                         onmouseover="tooltip.pop(this, '<h3>{{ item.title }}</h3>{{ item.summary }}')">
+                        <a href="/detail/{{ item.imdbid }}">
+                            <img title="{{ item.title }}"
+                                 src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg"
+                                 alt="{{ item.title }}" class="tooltip">
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div style="float: left;width: 85%"><h2>更多推荐：</h2></div>
+
+        <div class="change_content" style="float: left;width: 2.8%">
+            <a href="javascript:void(0)">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAGKADAAQAAAABAAAAGAAAAADiNXWtAAACjElEQVRIDdWVS2sTURTHJw+LopCsBwpVCK5E6cKFohCCGzcWlUgVQkImCRj1O7izC7EWN3nYSHBjEMSNC2sRF1ZRWz+ABEFrXCYBH9FMEn+nTi7TTCY10k0P/HPuPfd/HvfMzImm7XTxjLpAqVTabZrm+V6vNwPvMFr3eDy/WX8BK+wfptPpJWw9tziuCXK53EWcboBJN2exE/wtuJZKpV4P4zkSVCoVX71evw05awVYRS+CZ1S8PoF0Op394DQ2A0wB0+v1prvd7geS3QyFQsfD4bCJXfPLj10ajcYt9lmILXDZMIx7aHsLfnD+XlAul+dbrdYdEscJLkWYrP3VavWQxdG8LJQUCoULEK5KcIwRrl0aCK64sojFYt+DwWAGzhvrYKNgbne0T1QJaM0EVUjPRbI8vJW/S/dfbrCXGz+nKBVQ2CRUe5UA4lnOpsCaVI7eUqi0Q7Cn4CXkdt/BntD+DM5YhCIO9p73/Rw6kUhIK68L6MC+ZrN5kuARcLBPtieYFqPP51vqH46jo9HoN/hPLChX1SKy6mLVdf2zOt2GhUqwDbGGhlAJ6HtNGLVabeSXOzTKCKNKAEe+WI0X49QI/thHKgE3eGx5GzwPxwgZO7LloBIEAoFHJPmIfbpYLMb/N+Cg36ZK8/l8lOofQPrp9/sjyWTy1aDDsD1+KeyX8J3NZDJf7Rx1AzEyHiqoBbCH/4FlHOOj2iX/F3Dm4OTBCTpwTOLYZdMN5EDGNWNjHocrssdplfVd9DJ6HdMuPsYDvAwyrjNgkjMZGUwY54hxJMBhQ5isswy/OTZbvbZrJGSqGzLCHeKaQJjSgna7fY6l/GUe4Qbytf8Cn6j4HbhP4Bfof5pd+O1A+QNo9gei1AdUygAAAABJRU5ErkJggg=="
+                     alt="换一换">
+            </a>
+        </div>
+        <div class="change_content" style="float: left;width: 10%">
+            <a href="javascript:void(0)"><strong><em style="font-size: 20px;color: #131a20">换一换</em></strong></a>
+        </div>
+        <script>
+            function errorImg(img) {
+                img.src = "{% static 'images/img_error.jpg' %}";
+                img.onerror = null;
+            }
+        </script>
+        <script>
+            $(".change_content").click(function () {
+                $.ajax({
+                    url: "{% url 'api:recommend' %}",
+                    type: "get",
+                    success: function (data) {
+
+                        set_movies_list(data);
+                    }
+                })
+            })
+            window.onload = function () {
+                $.get("{% url 'api:recommend' %}", function (data, status) {
+                    console.log(data);
+                    set_movies_list(data);
+                })
+            }
+
+            function set_movies_list(data) {
+                data = JSON.parse(data);
+                var movies_list_innerHtml = ''
+                for (var i = 0; i < data.length; i++) {
+                    movies_list_innerHtml += '\n' +
+                        '<div style="margin-bottom: 1px;" class="movie">\n' +
+                        '    <figure class="movie-poster">\n' +
+                        '        <a href="/detail/' + data[i]["imdbid"] + '">\n' +
+                        '            <img src="/static/IMDb_imgs/' + data[i]['imdbid'] + '.jpg" alt="' + data[i]['title'] + '" onerror="errorImg(this)">\n' +
+                        '        </a>\n' +
+                        '    </figure>\n' +
+                        '    <div style="float:left;display:inline;width: 50%;font-family: fantasy;text-shadow: 0 0 1px black;font-size: 15px;color: #131a20">\n' +
+                        '        <p><i>' + data[i]['year'] + '</i></p>\n' +
+                        '    </div>\n' +
+                        '    <div class="star-rating" style="float:right;display:inline;">\n' +
+                        '        <span style="width:' + (parseInt(data[i]["imdbid"]) * 10).toString() + '%"></span>\n' +
+                        '    </div>\n' +
+                        '    <div style="margin-bottom: 1px;float:left;display:inline;width: 80%" class="movie-title"><a href="/detail/' + data[i]["imdbid"] + '">' + data[i]['title'] + ' </a></div>\n' +
+                        '    <div style="float:left;display:inline;width: 20%;height: 20%">\n' +
+                        '        <p style="margin-right:25%;font-family: fantasy;text-shadow: 0 0 2px black;font-size: 25px;color: aqua">\n' +
+                        '            <i>' + data[i]["score"] + '</i></p>\n' +
+                        '    </div>\n' +
+                        '</div>'
+                }
+                var movie_list = document.getElementById('movie-list')
+                movie_list.innerHTML = movies_list_innerHtml;
+            }
+
+        </script>
+
+
+        <div class="movie-list" id="movie-list"></div>
+
+
+        {#                <div class="movie-list">#}
+        {#                    {% for item in all %}#}
+        {#                        <div class="movie"#}
+        {#                             onmouseover="tooltip.pop(this, '#{{ item.imdbid }}', {position:1, offsetX:-20, effect:'slide'})">#}
+        {#                            <figure class="movie-poster">#}
+        {#                                <img src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg"#}
+        {#                                     alt="{{ item.title }}" onerror="errorImg(this)">#}
+        {#                            </figure>#}
+        {#                            <div class="movie-title"><a href="/detail/{{ item.imdbid }}">{{ item.title }}</a></div>#}
+        {#                            <div class="mcTooltipInner"#}
+        {#                                 style="display: none ;width: 251px; height: 272px;  position: absolute;">#}
+        {#                                <div id="{{ item.imdbid }}">#}
+        {#                                    <div style="float: left;width:50%;display: inline;">#}
+        {#                                        <img src="{% static 'IMDb_imgs/' %}{{ item.imdbid }}.jpg" alt="{{ item.title }}"#}
+        {#                                             onerror="errorImg(this)" style="width:91px;height:134px;">#}
+        {#                                    </div>#}
+        {#                                    <div style="float: left;width: 50%;display: inline;">#}
+        {#                                        <div class="star-rating" style="margin-left: 10px">#}
+        {#                                            <span style="width:{% widthratio item.score 1 10 %}%"></span>#}
+        {#                                        </div>#}
+        {#                                        <div style="padding-left: 5px;">#}
+        {#                                            <p><strong>#}
+        {#                                                {{ item.title }}#}
+        {#                                            </strong></p>#}
+        {#                                            <p>#}
+        {#                                                {{ item.title }}#}
+        {#                                            </p>#}
+        {#                                        </div>#}
+        {#                                    </div>#}
+        {#                                </div>#}
+        {#                            </div>#}
+        {#                        </div>#}
+        {#                    {% endfor %}#}
+        {#                </div>#}
+    </div>
+{% endblock %}

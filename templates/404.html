@@ -1,0 +1,41 @@
+{% extends 'master.html' %}
+{% load static %}
+{% block dropdowm %}
+    <button class="dropbtn">{% if is_login == "true" %}{{ nickname }}{% else %}未登录{% endif %}</button>
+
+    <div class="dropdown-content">
+        {% if is_login == "true" %}
+            <a href="/modify/nickname/{{ username }}/">修改昵称</a>
+            <a href="/modify/password/{{ username }}/">修改密码</a>
+            <a href="{% url 'enter:logout' %}">退出</a>
+            <a href="{% url 'enter:login' %}">切换账号</a>
+        {% else %}
+            <a href="{% url 'enter:login' %}">登录</a>
+            <a href="{% url 'enter:register' %}">注册</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+{% block menu-item %}
+    <li class="menu-item"><a href="{% url 'home:select' %}">首页</a></li>
+    <li class="menu-item"><a href="{% url 'home:douban_250' %}">榜单</a></li>
+    <li class="menu-item"><a href="{% url 'home:recommend' %}">为你推荐</a></li>
+    <li class="menu-item"><a href="{% url 'home:browse_records' %}">足迹</a></li>
+{% endblock %}
+{% block container %}
+    <script>
+        function countDown() {
+            var time = document.getElementById("count_down");
+            if (time.innerHTML === '0') {
+                window.location.href = "/"
+            } else {
+                time.innerHTML = time.innerHTML - 1;
+            }
+        }
+
+        window.setInterval("countDown()", 1000);
+    </script>
+    <h1>404 PAGE NOT FOUND</h1>
+    <p><a href="/">电影推荐系统 </a>提醒您：你当前访问的链接<strong>页面不存在</strong></p>
+    <p><span><u id="count_down">9</u>&nbsp;&nbsp;秒 后 将 </span><a href="/"> 返回首页</a></p>
+{% endblock %}

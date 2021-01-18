@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>电影推荐系统</title>
+    <link href="http://fonts.googleapis.com/css?family=Roboto:300,400,700|" rel="stylesheet" type="text/css">
+    <link href="{% static 'fonts/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://www.jq22.com/demo/jQuery-tooltip20160707/themes/1/tooltip.css">
+    <script src="https://www.jq22.com/demo/jQuery-tooltip20160707/themes/1/tooltip.js" type="text/javascript"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    {#    <script src="{% static 'js/jquery-1.11.1.min.js' %}"></script>#}
+    <script src="{% static 'js/plugins.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script type="text/javascript">
+
+        var myAjaxSetting = {
+            context: {index: -1},
+            success: myCallback,
+            responseType: "xml"
+        };
+
+        function myCallback(response, context) {
+            var x = response.documentElement.getElementsByTagName("cd")[context.index];
+            var title = x.getElementsByTagName("title")[0].childNodes[0].nodeValue;
+            var artist = x.getElementsByTagName("artist")[0].childNodes[0].nodeValue;
+            var price = x.getElementsByTagName("price")[0].childNodes[0].nodeValue;
+            var image = "<img src='src/tooltips-cd" + context.index + ".jpg' style='float:right;margin-left:12px;width:75px;height:75px;' />";
+            return "<div style='width:220px;'>" + image + "<b>" + title + "</b><br /><i>" + artist + "</i><br /><br />Price: <span class='red'>$" + price + "</span></div>";
+        }
+
+    </script>
+
+    <style>
+        .dropbtn {
+            background-color: #131a20;
+            color: white;
+            font-size: 25px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1{#background-color: #131a20;#}
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: #131a20;
+        }
+    </style>
+
+
+</head>
+<body>
+<div id="site-content">
+    <header class="site-header">
+        <div class="container">
+            <div style="float: left;display:inline">
+                <a href="/" id="branding"><img src={% static "images/logo.png" %} class="logo"></a>
+                <div class="dropdown">
+                    {% block dropdowm %}
+
+                    {% endblock %}
+                </div>
+            </div>
+            <div class="main-navigation" style="float: right;display: inline">
+                <button type="button" class="menu-toggle"><i class="fa fa-bars"></i></button>
+                <ul class="menu">
+                    {% block menu-item %}
+                    {% endblock %}
+                </ul>
+
+                <form target="_blank" action="{% url 'home:search' %}" class="search-form">
+                    <label>
+                        <input id="search_movie" class="active" name="kw" type="text" placeholder="Search Movie">
+                    </label>
+                    <button class="active"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="container">
+            {% block container %}{% endblock %}
+        </div>
+    </main>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="widget"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="widget"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="widget"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="widget"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="widget"></div>
+                </div>
+                <div class="col-md-2">
+                    <div class="widget">
+                        <h3 class="widget-title"><a href="#"> 回 到 顶 部 </a></h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="colophon">Copyright 2020-2021 by 李沛洋 | 孙丽薇 | 陈马钦 . All rights reserved</div>
+        </div>
+
+    </footer>
+</div>
+
+
+</body>
+
+</html>

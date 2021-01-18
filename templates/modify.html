@@ -1,0 +1,142 @@
+{% load static %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    {#    <link rel="icon" href="../../favicon.ico">#}
+    <title>{% if method == 'nickname' %}修改昵称{% elif method == 'password' %}修改密码{% endif %}</title>
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href={% static "/css/signin.css" %} rel="stylesheet">
+    <script src={% static '/js/myjs.js' %}></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
+    <script type="text/javascript">
+        //验证码动态刷新实现
+        $('.captcha').click(function () {
+            $.getJSON("/captcha/refresh/", function (result) {
+                $('.captcha').attr('src', result['image_url']);
+                $('#id_captcha_0').val(result['key'])
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="alert alert-danger alert-dismissible" role="alert" id="error"
+     style="margin-left: auto;margin-right: auto;text-align: center;
+             {% if not error %}display: none;{% else %}{% endif %}">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+            onclick="javascript:document.getElementById('error').style.display = 'none'">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <strong>{{ error }}</strong>
+    {% if back_button == "true" %}
+        <button class="btn" type="button">
+            <a href="javascript:history.back(-1)">
+                <span class="glyphicon glyphicon-hand-left"></span>
+                <strong> 回 退 </strong>
+            </a>
+        </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn" type="button">
+            <a href="{% url 'enter:register' %}">
+                <strong> 注 册 </strong>
+                <span class="glyphicon glyphicon-hand-right"></span>
+            </a>
+        </button>
+    {% endif %}
+</div>
+{% if back_button != "true" %}
+    <div class="container1" style="width: 45%;margin-left: 30%;">
+        <form class="form-horizontal" method="post">{% csrf_token %}
+            <h2 class="form-signin-heading" align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {% if method == 'nickname' %}
+                    修改昵称:
+                {% elif method == 'password' %}
+                    修改密码:
+                {% endif %}
+            </h2>
+            {% if method == 'nickname' %}
+                <div class="form-group">
+                    <label for="{{ register_form.nickname.id_for_label }}"
+                           class="col-md-2 control-label"
+                           style="text-align: right;width: 150px;">昵称:</label>
+                    <div class="col-sm-9  inline-style" style="width: 350px;display: inline-block;">
+                        <input type="text" name="nickname" class="form-control" required="" id="id_nickname"
+                               value="{{ nickname }}">
+                    </div>
+                    <span style="color: red">{{ register_form.nickname.errors.0 }}</span>
+                </div>
+             {% endif %}
+            <div class="form-group">
+                <label for="id_username"
+                       class="col-sm-2 control-label  inline-style font-position-right"
+                       style="display: inline-block;text-align: right;width: 150px;">用户名(邮箱):</label>
+                <div class="col-sm-9  inline-style" style="display: inline-block;width: 350px;">
+                    <input type="email" name="username" class="form-control" required="" id="id_username"
+                           value="{{ username }}"
+                           readonly data-toggle="tooltip" data-placement="right" title="不可更改">
+                </div>
+            </div>
+            {% if method == 'password' %}
+                <div class="form-group">
+                    <label for="id_old_password"
+                           class="col-sm-2 control-label  inline-style font-position-right"
+                           style="display: inline-block;text-align: right;width: 150px;">请输入旧密码:</label>
+                    <div class="col-sm-9  inline-style" style="display: inline-block;width: 350px;">
+                        <input type="password" name="old_password" minlength="8" class="form-control" required=""
+                               id="id_old_password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ register_form.first_password.id_for_label }}"
+                           class="col-sm-2 control-label  inline-style font-position-right"
+                           style="display: inline-block;text-align: right;width: 150px;">请输入新密码:</label>
+                    <div class="col-sm-9  inline-style" style="display: inline-block;width: 350px;">
+                        {{ register_form.first_password }}
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="{{ register_form.second_password.id_for_label }}"
+                           class="col-sm-2 control-label  inline-style font-position-right"
+                           style="display: inline-block;text-align: right;width: 150px;">请确认新密码:</label>
+                    <div class="col-sm-9  inline-style" style="display: inline-block;width: 350px;">
+                        {{ register_form.second_password }}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="form-group" align="center">
+                <button id="modify" class="btn  btn-primary btn-block " type="submit" style="width: 300px;">确认更改
+                </button>
+            </div>
+            <script>
+                $("#modify").click(function () {
+                    var first_password = $("#id_first_password").val()
+                    var second_password = $("#id_second_password").val()
+                    if (first_password !== second_password) {
+                        alert("两次密码不一致，请重新输入");
+                        return false;
+                    }
+                });
+            </script>
+        </form>
+    </div>
+{% endif %}
+
+
+</body>
+
+
+</html>
+
+
